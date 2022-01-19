@@ -132,7 +132,7 @@ int is_int(char *s)
 {
     if(!s || *s == '\0')
         return 0;
-    if(*s!='-' && !isdigit(*s)) 
+    if(*s!='-' && !isdigit(*s))
         return 0;
     s++;
     for(; *s; s++) {
@@ -215,7 +215,7 @@ void read_sat_problem(FILE *fin, SATProblem *prob, int is_unspeficied_wcnf)
             }
             p = strtok(NULL, delim);
         }
-        
+
         int is_zero_terminated = 0;
 
         for(; p; ){
@@ -454,7 +454,7 @@ void read_undirected_adjmatrix(FILE *fin, CUTProblem *prob)
             is_binary = 1;
     }
     fseek(fin, 0, SEEK_SET);
-    
+
     int lineno = 1;
     // handle coments for matrix market
     while(NULL != fgets(buf, buf_size, fin)
@@ -484,7 +484,7 @@ void read_undirected_adjmatrix(FILE *fin, CUTProblem *prob)
 
     prob->n = n;
     prob->C =    (Node**) Malloc(sizeof(Node*)*n);
-    // Space usage: nnz*(double+int)*2 + nnz*int. 
+    // Space usage: nnz*(double+int)*2 + nnz*int.
     //              The nnz*int part is for construction, will free after use.
     // Time: O(nnz).
     // We store the COO format in ipart and jpart,
@@ -517,7 +517,7 @@ void read_undirected_adjmatrix(FILE *fin, CUTProblem *prob)
             exit(1);
         }
         lineno++;
-        
+
         if (is_binary) {
             ret = sscanf(buf, " %d %d", &i, &j);
             expect = 2;
@@ -592,7 +592,7 @@ void read_undirected_adjmatrix(FILE *fin, CUTProblem *prob)
         *rear[i] = end_node;
     }
     prob->nnz = nnz;
-    
+
     free(ipart);
     free(rear);
     free(cap);
@@ -621,9 +621,9 @@ double square(double x)
 {   return x*x;   }
 
 double relu(double z)
-{   
+{
     double x = 1-z/4;
-    return (x>=0) ? x : 0.; 
+    return (x>=0) ? x : 0.;
 }
 
 void eval_maxsat(SATProblem *prob, double **V, double **Z, int k, double *fval, int *rval, double *upper, Parameter *param)
@@ -672,7 +672,7 @@ void eval_maxsat(SATProblem *prob, double **V, double **Z, int k, double *fval, 
             }
             *rval += (clause_sat[i] != 0);
             *upper += 1-(zi-(clen[i]-1))/div;
-            
+
             if(verbose && clause_sat[i] == 0) printf("%d ", i);
         }
         if(verbose) printf("\n");
@@ -721,7 +721,7 @@ void do_maxsat(SATProblem *prob, Model *model, Parameter *param)
         rand_unit(V[j], k);
     }
 
-    // init Ci = \sum_j +-vj - (len(Ci)-1)w 
+    // init Ci = \sum_j +-vj - (len(Ci)-1)w
     for(int i=1; i<=m; i++) {
         dzero(g, k);
         daxpy(g, -1., V[0], k);
@@ -780,7 +780,7 @@ void do_maxsat(SATProblem *prob, Model *model, Parameter *param)
         eval_maxsat(prob, V, Z, k, &fval, &rval, &upper, param);
         int64_t time_eval_ed = wall_clock_ns();
         time_eval += time_eval_ed-time_now;
-        
+
         double delta = fval_prev - fval;
         printf("iter %3d  fval %.14e  delta %.4e  rval %d/%d  %.4e  upper %.4e  time %.14e\n",
                 iter+1, fval, delta, rval, m, rval*1./m, upper/m, wall_time_diff(time_eval_ed-time_eval, time_st));
@@ -826,7 +826,7 @@ double eval_maxcut(CUTProblem *prob, Model *model, Parameter *param, int *roundi
         if (best_cut < cut) {
             int64_t time_now = wall_clock_ns();
             printf("trial %d\ttime %.16g\tcut %f\n",
-                    it, 
+                    it,
                 wall_time_diff(time_now, time_st), cut/4);
             best_cut = cut;
             for (int i=0; i<n; i++) best_rounding[i] = rounding[i];
@@ -943,7 +943,7 @@ void get_clause_stat(SATProblem *prob, int *min_len, int *max_len, double *avg_l
 void print_usage(char* prog_name, Parameter *param)
 {
     printf( "Mixing method for SDP\n");
-    printf( "\t%s [OPTIONS] INPUT\n", prog_name); 
+    printf( "\t%s [OPTIONS] INPUT\n", prog_name);
     printf( "\nOPTIONS:\n");
     printf( "\t-s SOLVER: type of solver\n");
     printf( "\t           \"-s maxcut\" for maximum cut\n");
@@ -1008,12 +1008,12 @@ void get_parameter(int argc, char **argv, Parameter *param)
             }
             i++, p++;
         }else if(!strcmp(*p, "-e")){
-            if(i+1 >= argc) break; 
+            if(i+1 >= argc) break;
             int ret = sscanf(p[1], "%lf", &_param.eps);
-            if(ret != 1) break; 
+            if(ret != 1) break;
             i++, p++;
         }else if(!strcmp(*p, "-t")){
-            if(i+1 >= argc) break; 
+            if(i+1 >= argc) break;
             if(!strcmp(p[1], "max")){
                 _param.max_iter = INT_MAX;
             }else{
@@ -1024,7 +1024,7 @@ void get_parameter(int argc, char **argv, Parameter *param)
         }else if(!strcmp(*p, "-r")){
             if(i+1 >= argc) break;
             int ret = sscanf(p[1], "%d", &_param.n_trial);
-            if(ret != 1) break; 
+            if(ret != 1) break;
             if(_param.n_trial < 1)
                 _param.n_trial = 1;
             i++, p++;
@@ -1082,7 +1082,7 @@ int main(int argc, char **argv)
     strcpy(fout_name, param.fin_name);
     strcat(fout_name, ".sol");
     FILE *fout = fopen(fout_name, "w");
-    for (int i=0; i<model.n; i++) {
+    for (int i=0; i<=model.n; i++) {
         for (int j=0; j<model.k; j++)
             fprintf(fout, "%.22g ", model.V[i][j]);
         fprintf(fout, "\n");
